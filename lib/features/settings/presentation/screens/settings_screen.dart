@@ -107,6 +107,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   runSpacing: 8,
                   children: [
                     ActionChip(
+                      avatar: const Icon(Icons.wifi, size: 16),
+                      label: const Text('Wi-Fi PC (192.168.2.17)'),
+                      onPressed: () => _applyPreset('http://192.168.2.17:8000/api'),
+                    ),
+                    ActionChip(
                       avatar: const Icon(Icons.android, size: 16),
                       label: const Text('Emulador Android (10.0.2.2)'),
                       onPressed: () => _applyPreset('http://10.0.2.2:8000/api'),
