@@ -102,9 +102,62 @@ void main() {
       expect(vaselina.name, equals('Petrolato / Vaselina'));
       expect(vaselina.safetyScore, equals(4.5));
       expect(vaselina.isPetroleumDerived, isTrue);
+      expect(vaselina.hasRedflags, isTrue);
+      expect(vaselina.redflags, contains('Derivado de Petróleo'));
 
       // Unmapped Ingredients
       expect(result.unmappedIngredients, equals(['PHENOXYETHANOL']));
+    });
+
+    test('parses quick lightweight payload with has_redflags and redflags array correctly', () {
+      final quickJson = {
+        'score': 68,
+        'rating_label': 'Atenção Moderada',
+        'rating_color': '#F59E0B',
+        'total_detected': 2,
+        'total_mapped': 2,
+        'total_unmapped': 0,
+        'badges': {
+          'is_vegan': true,
+          'is_clean_beauty': false,
+          'is_microplastic_free': false,
+          'is_petroleum_free': false,
+          'is_low_poo_approved': false,
+          'is_no_poo_approved': false,
+        },
+        'critical_alerts': [
+          '🛢️ Contém Derivado de Petróleo (Petrolatum)',
+        ],
+        'mapped_ingredients': [
+          {
+            'id': 10,
+            'matched_term': 'AQUA',
+            'name': 'Aqua',
+            'inci_name': 'Aqua',
+            'safety_score': 10.0,
+            'has_redflags': false,
+            'redflags': <String>[],
+          },
+          {
+            'id': 1,
+            'matched_term': 'VASELINA',
+            'name': 'Petrolato / Vaselina',
+            'inci_name': 'Petrolatum',
+            'safety_score': 4.5,
+            'has_redflags': true,
+            'redflags': ['Derivado de Petróleo', 'Proibido Low/No Poo'],
+          },
+        ],
+        'unmapped_ingredients': <String>[],
+      };
+
+      final result = AnalysisResultModel.fromJson(quickJson);
+      expect(result.score, equals(68));
+      expect(result.mappedIngredients.length, equals(2));
+      expect(result.mappedIngredients[0].hasRedflags, isFalse);
+      expect(result.mappedIngredients[0].redflags, isEmpty);
+      expect(result.mappedIngredients[1].hasRedflags, isTrue);
+      expect(result.mappedIngredients[1].redflags, equals(['Derivado de Petróleo', 'Proibido Low/No Poo']));
     });
 
     test('handles missing or nullable fields gracefully with safe fallbacks', () {

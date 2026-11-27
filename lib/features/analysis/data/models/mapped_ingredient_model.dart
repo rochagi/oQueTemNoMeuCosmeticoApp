@@ -8,6 +8,8 @@ class MappedIngredientModel extends Equatable {
   final String? casNumber;
   final String? functionCategory;
   final double safetyScore;
+  final bool hasRedflags;
+  final List<String> redflags;
   final int comedogenicRating;
   final int irritationRating;
   final bool isVegan;
@@ -27,6 +29,8 @@ class MappedIngredientModel extends Equatable {
     this.casNumber,
     this.functionCategory,
     this.safetyScore = 5.0,
+    this.hasRedflags = false,
+    this.redflags = const [],
     this.comedogenicRating = 0,
     this.irritationRating = 0,
     this.isVegan = false,
@@ -40,6 +44,23 @@ class MappedIngredientModel extends Equatable {
   });
 
   factory MappedIngredientModel.fromJson(Map<String, dynamic> json) {
+    final parsedRedflags = (json['redflags'] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        [
+          if (json['is_petroleum_derived'] == true) 'Derivado de Petróleo',
+          if (json['is_microplastic'] == true) 'Microplástico',
+          if (json['is_low_poo_approved'] == false || json['is_no_poo_approved'] == false)
+            'Proibido Low/No Poo',
+          if (json['carcinogenicity_risk_level'] == 'confirmed') 'Carcinogênico Confirmado',
+          if (json['carcinogenicity_risk_level'] == 'suspected') 'Suspeita Carcinogênica',
+          if (json['endocrine_disruptor_risk_level'] == 'high' ||
+              json['endocrine_disruptor_risk_level'] == 'confirmed')
+            'Disruptor Endócrino',
+        ];
+
+    final hasFlags = json['has_redflags'] as bool? ?? parsedRedflags.isNotEmpty;
+
     return MappedIngredientModel(
       id: json['id'] as int? ?? 0,
       matchedTerm: json['matched_term'] as String? ?? '',
@@ -48,6 +69,8 @@ class MappedIngredientModel extends Equatable {
       casNumber: json['cas_number'] as String?,
       functionCategory: json['function_category'] as String?,
       safetyScore: (json['safety_score'] as num?)?.toDouble() ?? 5.0,
+      hasRedflags: hasFlags,
+      redflags: parsedRedflags,
       comedogenicRating: json['comedogenic_rating'] as int? ?? 0,
       irritationRating: json['irritation_rating'] as int? ?? 0,
       isVegan: json['is_vegan'] as bool? ?? false,
@@ -70,6 +93,8 @@ class MappedIngredientModel extends Equatable {
     casNumber,
     functionCategory,
     safetyScore,
+    hasRedflags,
+    redflags,
     comedogenicRating,
     irritationRating,
     isVegan,

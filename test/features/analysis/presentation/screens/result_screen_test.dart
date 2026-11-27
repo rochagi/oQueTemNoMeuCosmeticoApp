@@ -78,6 +78,6 @@ void main() {
     await tester.tap(find.text('Aqua / Água Purificada'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Ver Ficha Completa (Mecanismos & Estudos)'), findsOneWidget);
+    expect(find.text('Ver Ficha Técnica Completa (Dossiê)'), findsOneWidget);
   });
 }
